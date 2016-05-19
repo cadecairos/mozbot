@@ -1,1 +1,1 @@
-web: bin/hubot -a mattermost
+web: bin/hubot -a matteruser
