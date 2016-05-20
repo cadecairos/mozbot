@@ -62,6 +62,7 @@ module.exports = (robot) ->
     switch event.type
       when 'issues' then formatIssues event
       when 'pull_request' then formatPulls event
+      when 'push' then formatPushes event
       else null
 
   formatIssues = (event) ->
@@ -91,3 +92,17 @@ module.exports = (robot) ->
         [#{issue.title}](#{issue.html_url})
         """
       else null
+
+  formatPushes = (event) ->
+    data = event.data
+    return unless data.commits and data.commits.length > 0
+
+    message = "#{data.pusher.name} pushed #{ordinal(data.commits.length, 'commit')} to #{data.repository.full_name}"
+    message += "\n * #{commit.message.split("\n")[0]}" for commit in data.commits
+    message += "\n\n#{data.compare}"
+    message
+
+
+  ordinal = (size, singularNoun) ->
+    noun = if size is 1 then singularNoun else singularNoun + "s"
+    "#{size} #{noun}"
