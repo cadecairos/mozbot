@@ -61,6 +61,7 @@ module.exports = (robot) ->
   format = (event) ->
     switch event.type
       when 'issues' then formatIssues event
+      when 'pull_request' then formatPulls event
       else null
 
   formatIssues = (event) ->
@@ -72,6 +73,21 @@ module.exports = (robot) ->
 
         """
         #{userName} #{action} Issue ##{issue.number} on #{repository.full_name}
+
+        [#{issue.title}](#{issue.html_url})
+        """
+      else null
+
+  formatPulls = (event) ->
+    data = event.data
+    switch data.action
+      when 'opened', 'closed', 'reopened'
+        {pull_request, sender, repository} = data 
+        verb = if pull_request.merged? then pull_request.merged else data.action
+
+        """
+        #{sender.login} #{verb} Pull Request ##{pull_request.number} on #{repository.full_name}
+
         [#{issue.title}](#{issue.html_url})
         """
       else null
