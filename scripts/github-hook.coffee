@@ -61,6 +61,8 @@ module.exports = (robot) ->
       when 'issues' then formatIssues event
       when 'pull_request' then formatPulls event
       when 'push' then formatPushes event
+      when 'deployment' then formatDeployment event
+      when 'deployment_status' then formatDeploymentStatus event 
       else null
 
   formatIssues = (event) ->
@@ -92,6 +94,10 @@ module.exports = (robot) ->
       else null
 
   formatPushes = (event) ->
+    ordinal = (size, singularNoun) ->
+      noun = if size is 1 then singularNoun else singularNoun + "s"
+      "#{size} #{noun}"
+
     data = event.data
     return unless data.commits and data.commits.length > 0
 
@@ -100,7 +106,18 @@ module.exports = (robot) ->
     message += "\n\n#{data.compare}"
     message
 
+  formatDeployment = (event) ->
+    deployment = data.deployment
 
-  ordinal = (size, singularNoun) ->
-    noun = if size is 1 then singularNoun else singularNoun + "s"
-    "#{size} #{noun}"
+    """
+    #{deployment.creator.login} started a deployment of #{deployment.sha[0..8]} in #{deployment.name} to #{deployment.environment}
+    Description: #{deployment.description}
+    """
+
+  formatDeploymentStatus = (event) ->
+    deployment_status = event.deployment_status
+
+    """
+    Deployment of #{deployment_status.repository.name} to #{deployment_status.deployment.environment} by #{deployment_status.creator.login} has ended in #{deployment_status.state}
+    Description: #{deployment_status.description}
+    """
