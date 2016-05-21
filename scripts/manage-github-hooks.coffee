@@ -3,6 +3,7 @@
 #
 # Configuration
 #   HUBOT_GITHUB_EVENT_HOOK_TOKEN - required - token with ability to create hooks on repos
+#   HUBOT_GITHUB_HOOK_SECRET = shared secret for validating github hook payloads
 #   HUBOT_GITHUB_EVENT_BASE_URL - required - Hook base URL
 #
 # Author:
@@ -54,7 +55,7 @@ class HookManager
         active: true
         config:
           content_type: 'json'
-          secret: process.env.HUBOT_GITHUB_EVENT_SECRET
+          secret: process.env.HUBOT_GITHUB_HOOK_SECRET
           url: url
         events: SUPPORTED_EVENTS
 

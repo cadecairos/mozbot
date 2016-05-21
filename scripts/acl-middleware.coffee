@@ -17,8 +17,7 @@ module.exports = (robot) ->
     robot.logger.debug "Starting role check"
     allowed = true
 
-    for role of ROLES
-      role_ids = ROLES[role];
+    for role, role_ids of ROLES
       robot.logger.debug "checking #{role} - protected action ids: #{JSON.stringify role_ids}"
 
       if context.listener.options.id in role_ids
