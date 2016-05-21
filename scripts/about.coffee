@@ -14,5 +14,23 @@
 #   Christopher De Cairos
 
 module.exports = (robot) ->
+
+  about = (msg) ->
+    msg.send """
+      Hello #{msg.user.name}
+
+      This one's designation is: mozbot
+
+      You may command mozbot to do various tasks for you - or to send you animated gifs.
+
+      Execute `mozbot help` to see a complete list of commands.
+
+      To make mozbot smarter, or to suggest features [file an issue on GitHub](https://github.com/cadecairos/mozbot/issues/new)
+      """
+
+
   robot.respond /about/i, (msg) ->
-    msg.send "Hi, I'm mozbot, I do things! You can see what I do by running `mozbot help`. If you'd like to help make me smarter, [click here](https://github.com/cadecairos/mozbot)"
+    about msg
+
+  robot.respond /(who|what) are you\??/i, (msg) ->
+    about msg
