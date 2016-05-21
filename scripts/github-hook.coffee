@@ -1,9 +1,6 @@
 # Description:
 #   Process github hooks
 #
-# Dependencies:
-#   matteruser adapter
-#
 # Configuration
 #   HUBOT_GITHUB_HOOK_SECRET - required, the secret used to validate the authenticity of the request
 #   HUBOT_GITHUB_CHANNEL_MAP - required, map channel name to id for hooks to send messages proplerly
@@ -34,9 +31,10 @@ module.exports = (robot) ->
     event.signature is signature
 
   robot.router.post '/mozbot/github-events/:room', (req, res) ->
+    channel = channelMap[req.params.room]
     event = 
       data: req.body
-      room: channelMap[req.params.room]
+      room: if channel then channel else req.params.room
       signature: req.get 'X-Hub-Signature'
       type: req.get 'X-Github-Event'
 
