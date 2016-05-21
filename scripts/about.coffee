@@ -16,6 +16,7 @@
 module.exports = (robot) ->
 
   about = (msg) ->
+    robot.logger.debug msg
     msg.send """
       Hello #{msg.user.name}
 
