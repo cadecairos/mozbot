@@ -64,7 +64,7 @@ module.exports = (robot) ->
         userName = sender?.login ? issue.user.login
 
         """
-        #{userName} #{action} Issue ##{issue.number} on #{repository.full_name}
+        [#{userName}](https://github.com/#{userName}) #{action} Issue ##{issue.number} on [#{repository.full_name}](https://github.com/#{repository.full_name})
 
         [#{issue.title}](#{issue.html_url})
         """
@@ -78,37 +78,41 @@ module.exports = (robot) ->
         verb = if pull_request.merged? then pull_request.merged else data.action
 
         """
-        #{sender.login} #{verb} Pull Request ##{pull_request.number} on #{repository.full_name}
+        [#{sender.login}](https://github.com/#{sender.login}) #{verb} Pull Request ##{pull_request.number} on [#{repository.full_name}](https://github.com/#{repository.full_name})
 
         [#{issue.title}](#{issue.html_url})
         """
       else null
 
+  ordinal = (size, singularNoun) ->
+    noun = if size is 1 then singularNoun else singularNoun + "s"
+    "#{size} #{noun}"
+
   formatPushes = (event) ->
-    ordinal = (size, singularNoun) ->
-      noun = if size is 1 then singularNoun else singularNoun + "s"
-      "#{size} #{noun}"
 
-    data = event.data
-    return unless data.commits and data.commits.length > 0
-
-    message = "#{data.pusher.name} pushed #{ordinal(data.commits.length, 'commit')} to #{data.repository.full_name}"
-    message += "\n * #{commit.message.split("\n")[0]}" for commit in data.commits
-    message += "\n\n#{data.compare}"
-    message
-
-  formatDeployment = (event) ->
-    deployment = data.deployment
+    {commits, pusher, repository, compare} = event.data
+    return unless commits?.length > 0
 
     """
-    #{deployment.creator.login} started a deployment of #{deployment.sha[0..8]} in #{deployment.name} to #{deployment.environment}
-    Description: #{deployment.description}
+    [#{pusher.name}](https://github.com/#{pusher.name}) pushed #{ordinal(commits.length, 'commit')} to [#{repository.full_name}](https://github.com/#{repository.full_name})
+
+    #{('*' + commit.message.split("\n")[0]) for commit in commits}
+
+    #{compare}
+    """
+
+  formatDeployment = (event) ->
+    {creator, sha, name, environment, description} = data.deployment
+
+    """
+    [#{creator.login}](https://github.com/{creator.login}) started a deployment of #{sha[0..8]} in [#{name}](https://github.com/#{name}) to #{environment}
+    Description: #{description}
     """
 
   formatDeploymentStatus = (event) ->
-    deployment_status = event.deployment_status
+    {repository, deployment, state, creator, state, description } = event.deployment_status
 
     """
-    Deployment of #{deployment_status.repository.name} to #{deployment_status.deployment.environment} by #{deployment_status.creator.login} has ended in #{deployment_status.state}
-    Description: #{deployment_status.description}
+    Deployment of [#{repository.name}](https://github.com/#{repository.name}) to #{deployment.environment} by [#{creator.login}](https://github.com/#{creator.login}) has ended in #{state}
+    Description: #{description}
     """
