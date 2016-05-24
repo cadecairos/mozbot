@@ -91,7 +91,10 @@ module.exports = (robot) ->
   formatPushes = (event) ->
 
     {commits, pusher, repository, compare} = event.data
-    return unless commits?.length > 0
+    return null unless commits?.length > 0
+
+    # damn greenskeeper commits be flooding my channels! 
+    return null if commits[0].message.indexOf("chore(package)") != -1
 
     """
     [#{pusher.name}](https://github.com/#{pusher.name}) pushed #{ordinal(commits.length, 'commit')} to [#{repository.full_name}](https://github.com/#{repository.full_name})
