@@ -88,13 +88,25 @@ module.exports = (robot) ->
     noun = if size is 1 then singularNoun else singularNoun + "s"
     "#{size} #{noun}"
 
+  # limit push notifications to master and develop branches
+  refRegex = /// ^                # match from beginning
+    \/ refs                       # string should lead with /refs
+    \/ head                       # then /head
+    \/ (?:                        # non capturing group
+      master | develop            # Then it should show the branch name this pull happened on, we want master or develop
+    )
+  ///
+
   formatPushes = (event) ->
 
-    {commits, pusher, repository, compare} = event.data
+    {ref, commits, pusher, repository, compare} = event.data
+    return null unless refRegex.match(ref)
     return null unless commits?.length > 0
 
+    branchName = refs.split('/')[2]
+
     """
-    [#{pusher.name}](https://github.com/#{pusher.name}) pushed #{ordinal(commits.length, 'commit')} to [#{repository.full_name}](https://github.com/#{repository.full_name})
+    [#{pusher.name}](https://github.com/#{pusher.name}) pushed #{ordinal(commits.length, 'commit')} to [#{repository.full_name}/#{branchName}](https://github.com/#{repository.full_name}/tree/#{branchName})
 
     #{('*' + commit.message.split("\n")[0]) for commit in commits}
 
