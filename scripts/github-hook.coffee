@@ -117,18 +117,19 @@ module.exports = (robot) ->
     """
 
   formatDeployment = (event) ->
-    {creator, sha, name, environment, description} = event.data.deployment
+    {repository, deployment} = event.data
+    {creator, sha, environment} = deployment
 
     """
-    [#{creator.login}](https://github.com/{creator.login}) started a deployment of #{sha[0..8]} in [#{name}](https://github.com/#{name}) to #{environment}
+    [#{creator.login}](#{creator.html_url}) started a deployment of #{sha[0..8]} in [#{repository.name}](#{repository.html_url}) to #{environment}
     """
 
   formatDeploymentStatus = (event) ->
     {repository, deployment} = event.data
-    {state, creator, description} = event.data.deployment_status
+    {state, creator} = event.data.deployment_status
 
     return null if state is "pending"
 
     """
-    Deployment of [#{repository.name}](https://github.com/#{repository.name}) to #{deployment.environment} by [#{creator.login}](https://github.com/#{creator.login}) has ended in #{state}
+    Deployment of [#{repository.name}](#{repository.html_url}) to #{deployment.environment} by [#{creator.login}](#{creator.html_url}) has ended in #{state}
     """
