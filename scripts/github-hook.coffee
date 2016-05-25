@@ -74,13 +74,16 @@ module.exports = (robot) ->
     data = event.data
     switch data.action
       when 'opened', 'closed', 'reopened'
-        {pull_request, sender, repository} = data 
+        {pull_request, base, sender, repository} = data
+        return null unless base?.ref in ["master", "develop"]
         verb = if pull_request.merged? then pull_request.merged else data.action
 
         """
-        [#{sender.login}](https://github.com/#{sender.login}) #{verb} Pull Request ##{pull_request.number} on [#{repository.full_name}](https://github.com/#{repository.full_name})
+        [#{sender.login}](https://github.com/#{sender.login}) #{verb} Pull Request ##{pull_request.number} on [#{repository.full_name}##{base.ref}](https://github.com/#{repository.full_name}/tree/#{base.ref})
+        
+        [#{pullRequest.title}](#{pullRequest.html_url})
 
-        [#{issue.title}](#{issue.html_url})
+        
         """
       else null
 
@@ -106,7 +109,7 @@ module.exports = (robot) ->
     branchName = refs.split('/')[2]
 
     """
-    [#{pusher.name}](https://github.com/#{pusher.name}) pushed #{ordinal(commits.length, 'commit')} to [#{repository.full_name}/#{branchName}](https://github.com/#{repository.full_name}/tree/#{branchName})
+    [#{pusher.name}](https://github.com/#{pusher.name}) pushed #{ordinal(commits.length, 'commit')} to [#{repository.full_name}##{branchName}](https://github.com/#{repository.full_name}/tree/#{branchName})
 
     #{('*' + commit.message.split("\n")[0]) for commit in commits}
 
