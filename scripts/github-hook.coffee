@@ -117,17 +117,16 @@ module.exports = (robot) ->
     """
 
   formatDeployment = (event) ->
-    {creator, sha, name, environment, description} = data.deployment
+    {creator, sha, name, environment, description} = event.data.deployment
 
     """
     [#{creator.login}](https://github.com/{creator.login}) started a deployment of #{sha[0..8]} in [#{name}](https://github.com/#{name}) to #{environment}
-    Description: #{description}
     """
 
   formatDeploymentStatus = (event) ->
-    {repository, deployment, state, creator, state, description } = event.deployment_status
+    {repository, deployment} = event.data
+    {state, creator, description} = event.data.deployment_status
 
     """
     Deployment of [#{repository.name}](https://github.com/#{repository.name}) to #{deployment.environment} by [#{creator.login}](https://github.com/#{creator.login}) has ended in #{state}
-    Description: #{description}
     """
