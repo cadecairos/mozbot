@@ -93,9 +93,9 @@ module.exports = (robot) ->
 
   # limit push notifications to master and develop branches
   refRegex = /// ^                # match from beginning
-    \/ refs                       # string should lead with /refs
-    \/ head                       # then /head
-    \/ (?:                        # non capturing group
+    / refs                       # string should lead with /refs
+    / head                       # then /head
+    / (?:                        # non capturing group
       master | develop            # Then it should show the branch name this pull happened on, we want master or develop
     )
   ///
