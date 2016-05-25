@@ -127,6 +127,8 @@ module.exports = (robot) ->
     {repository, deployment} = event.data
     {state, creator, description} = event.data.deployment_status
 
+    return null if state is "pending"
+
     """
     Deployment of [#{repository.name}](https://github.com/#{repository.name}) to #{deployment.environment} by [#{creator.login}](https://github.com/#{creator.login}) has ended in #{state}
     """
