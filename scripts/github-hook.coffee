@@ -121,7 +121,7 @@ module.exports = (robot) ->
     {creator, sha, environment} = deployment
 
     """
-    [#{creator.login}](#{creator.html_url}) started a deployment of [#{sha[0..8]}](#{repository.html_url}/commits/#{sha}) in [#{repository.name}](#{repository.html_url}) to #{environment}
+    [#{creator.login}](#{creator.html_url}) started a deployment of [#{sha[0..8]}](#{repository.html_url}/commit/#{sha}) in [#{repository.name}](#{repository.html_url}) to #{environment}
     """
 
   formatDeploymentStatus = (event) ->
