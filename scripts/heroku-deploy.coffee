@@ -23,16 +23,10 @@ VALID_APPS =
     repo: "cadecairos/mattermost-heroku"
     staging:
       name: "chat-mozillafdn-org-staging"
+      id: "588179ba-c7aa-49a7-b13e-e4d1c99ca68f"
     production:
       name: "chat-mozillafdn-org-production"
-  donate:
-    role: "deploy_donate"
-    defaultBlobRef: "master"
-    repo: "mozilla/donate.mozilla.org"
-    staging:
-      name: "donate-mozilla-org-us-staging"
-    production:
-      name: "donate-mozilla-org-us-prod"
+      id: "d107cb3c-d8c3-467f-8b04-84a26b3ed341"
   publish:
     role: "deploy_publish"
     defaultBlobRef: "master"
@@ -59,9 +53,8 @@ VALID_APPS =
 AUTH_HEADER = "Bearer #{process.env.HEROKU_API_TOKEN}"
 
 module.exports = (robot) ->
-  robot.respond /deploy ([a-zA-Z\d\-]+)(?:@([a-zA-Z\d\-]+))? to staging$/i, { id: "heroku.deploy" }, (msg) ->
-    appName = msg.match[1]
-    blobRef = msg.match[2]
+  robot.respond /deploy ([a-zA-Z\d\-]+)(?:@([a-zA-Z\d\-]+))? to (staging|production)?$/i, { id: "heroku.deploy" }, (msg) ->
+    [ appName, blobRef, env ] = msg.match[1..]
 
     appData = VALID_APPS[appName]
 
@@ -74,7 +67,10 @@ module.exports = (robot) ->
     unless robot.auth.hasRole msg.envelope.user, appData.role
       return msg.send "You need the '#{appData.role}'' role to deploy #{appName}"
 
-    deploy { appName, appData, blobRef, msg }
+    if env == "production" and appData.pipelineId?
+      return msg.send "This app should production deploy using pipelines only"
+
+    deploy { appName, appData, blobRef, env, msg }
 
   robot.respond /promote ([a-zA-Z\d\-]+) to production$/i, { id: "heroku.promote" }, (msg) ->
     appName = msg.match[1]
@@ -117,15 +113,15 @@ sendRequest = (msg, requestUrl, body, callback) ->
       callback JSON.parse(body)
 
 deploy = (options) ->
-  { appName, appData, blobRef, msg } = options
+  { appName, appData, blobRef, env, msg } = options
 
-  requestUrl = "https://kolkrabbi.herokuapp.com/apps/#{appData.staging.id}/github/push"
+  requestUrl = "https://kolkrabbi.herokuapp.com/apps/#{appData[env].id}/github/push"
 
   body = JSON.stringify
     branch: blobRef
 
   sendRequest msg, requestUrl, body, (responseBody) ->
-    msg.send "**Staging** deployment of **#{appName}** started - [Click here to watch](https://dashboard.heroku.com/apps/#{appData.staging.name}/activity/builds/#{responseBody.id})"
+    msg.send "**#{env}** deployment of **#{appName}** started - [Click here to watch](https://dashboard.heroku.com/apps/#{appData.staging.name}/activity/builds/#{responseBody.id})"
 
 promote = (options) ->
   { appName, appData, msg } = options
