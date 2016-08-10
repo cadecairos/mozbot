@@ -76,7 +76,8 @@ module.exports = (robot) ->
     unless robot.auth.hasRole msg.envelope.user, appData.role
       return msg.send "You need the '#{appData.role}'' role to deploy #{appName}"
 
-    deploy { appName, appData, blobRef, msg }
+    fetchGitRef {appData, blobRef, msg}, (gitRef) ->
+      deploy { appName, appData, blobRef, gitRef, msg }
 
   robot.respond /promote ([a-zA-Z\d\-]+) to production$/i, { id: "heroku.promote" }, (msg) ->
     appName = msg.match[1]
@@ -118,8 +119,19 @@ sendRequest = (msg, requestUrl, body, callback) ->
       return msg.send "The request was not successful" if res.statusCode isnt 201
       callback JSON.parse(body)
 
+fetchGitRef = (options, callback) ->
+  { appData, blobRef, msg } = options
+
+  msg.http("https://api.github.com/repos/#{appData.repo}/git/refs/heads/#{blobRef}")
+  .get() (err, res, body) ->
+    return msg.send "An error occurred #{err}" if err?
+    return msg.send "The request was not successful" if res.statusCode isnt 200
+    body = JSON.parse body
+    callback body.object.sha[0..7]
+
+
 deploy = (options) ->
-  { appName, appData, blobRef, msg } = options
+  { appName, appData, blobRef, gitRef, msg } = options
 
   requestUrl = "#{HEROKU_API_URL}/apps/#{appData.staging.name}/builds"
 
@@ -128,6 +140,7 @@ deploy = (options) ->
   body = JSON.stringify
     source_blob:
       url: blobUrl
+      version: gitRef
 
   sendRequest msg, requestUrl, body, (responseBody) ->
     msg.send "**Staging** deployment of **#{appName}** started - [Click here to watch](https://dashboard.heroku.com/apps/#{appData.staging.name}/activity/builds/#{responseBody.id})"
