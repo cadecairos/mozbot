@@ -56,8 +56,6 @@ VALID_APPS =
       id: "d076d414-3ff2-4dc6-a61c-b318cc72b410"
     pipelineId: "a5e867f8-2101-41da-8c61-ba00bb30acbf"
 
-HEROKU_API_URL = "https://api.heroku.com"
-GITHUB_URL = "https://github.com"
 AUTH_HEADER = "Bearer #{process.env.HEROKU_API_TOKEN}"
 
 module.exports = (robot) ->
@@ -76,8 +74,7 @@ module.exports = (robot) ->
     unless robot.auth.hasRole msg.envelope.user, appData.role
       return msg.send "You need the '#{appData.role}'' role to deploy #{appName}"
 
-    fetchGitRef {appData, blobRef, msg}, (gitRef) ->
-      deploy { appName, appData, blobRef, gitRef, msg }
+    deploy { appName, appData, blobRef, msg }
 
   robot.respond /promote ([a-zA-Z\d\-]+) to production$/i, { id: "heroku.promote" }, (msg) ->
     appName = msg.match[1]
@@ -119,28 +116,13 @@ sendRequest = (msg, requestUrl, body, callback) ->
       return msg.send "The request was not successful" if res.statusCode isnt 201
       callback JSON.parse(body)
 
-fetchGitRef = (options, callback) ->
-  { appData, blobRef, msg } = options
-
-  msg.http("https://api.github.com/repos/#{appData.repo}/git/refs/heads/#{blobRef}")
-  .get() (err, res, body) ->
-    return msg.send "An error occurred #{err}" if err?
-    return msg.send "The request was not successful" if res.statusCode isnt 200
-    body = JSON.parse body
-    callback body.object.sha[0..7]
-
-
 deploy = (options) ->
-  { appName, appData, blobRef, gitRef, msg } = options
+  { appName, appData, blobRef, msg } = options
 
-  requestUrl = "#{HEROKU_API_URL}/apps/#{appData.staging.name}/builds"
-
-  blobUrl = "#{GITHUB_URL}/#{appData.repo}/archive/#{blobRef}.tar.gz"
+  requestUrl = "https://kolkrabbi.herokuapp.com/apps/#{appData.staging.id}/github/push"
 
   body = JSON.stringify
-    source_blob:
-      url: blobUrl
-      version: gitRef
+    branch: blobRef
 
   sendRequest msg, requestUrl, body, (responseBody) ->
     msg.send "**Staging** deployment of **#{appName}** started - [Click here to watch](https://dashboard.heroku.com/apps/#{appData.staging.name}/activity/builds/#{responseBody.id})"
@@ -148,7 +130,7 @@ deploy = (options) ->
 promote = (options) ->
   { appName, appData, msg } = options
 
-  requestUrl = "#{HEROKU_API_URL}/pipeline-promotions"
+  requestUrl = "https://api.heroku.com/pipeline-promotions"
 
   body = JSON.stringify({
     pipeline:
