@@ -121,7 +121,7 @@ deploy = (options) ->
     branch: blobRef
 
   sendRequest msg, requestUrl, body, (responseBody) ->
-    msg.send "**#{env}** deployment of **#{appName}** started - [Click here to watch](https://dashboard.heroku.com/apps/#{appData.staging.name}/activity/builds/#{responseBody.id})"
+    msg.send "**#{env}** deployment of **#{appName}** started - [Click here to watch](https://dashboard.heroku.com/apps/#{appData.staging.name}/activity/builds/#{responseBody.build.id})"
 
 promote = (options) ->
   { appName, appData, msg } = options
