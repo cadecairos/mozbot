@@ -116,7 +116,7 @@ deploy = (options) ->
   { appName, appData, blobRef, env, msg } = options
 
   requestUrl = "https://kolkrabbi.herokuapp.com/apps/#{appData[env].id}/github/push"
-
+  console.log(requestUrl)
   body = JSON.stringify
     branch: blobRef
 
