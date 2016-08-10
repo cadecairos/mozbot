@@ -97,7 +97,8 @@ appList = () ->
   for appName, appData of VALID_APPS
     do (appName, appData) ->
       list += "* ** #{appName}** deploys #{appData.defaultBlobRef} to staging"
-      list += " and supports promoting to production using pipelines" if appData.pipelineId?
+      list += " and supports promoting to production using pipelines" if appData.pipelineId? 
+      list += " and must be pushed directly to production" if !appData.pipelineId?
       list += "\n"
 
   list
