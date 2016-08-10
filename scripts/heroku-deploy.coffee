@@ -123,7 +123,7 @@ deploy = (options) ->
 
   requestUrl = "#{HEROKU_API_URL}/apps/#{appData.staging.name}/builds"
 
-  blobUrl = "#{GITHUB_URL}/#{appData.repo}/#{blobRef}.tar.gz"
+  blobUrl = "#{GITHUB_URL}/#{appData.repo}/archive/#{blobRef}.tar.gz"
 
   body = JSON.stringify
     source_blob:
