@@ -109,7 +109,7 @@ sendRequest = (msg, requestUrl, body, callback) ->
     .header("Authorization", AUTH_HEADER)
     .post(body) (err, res, body) ->
       return msg.send "An error occurred #{err}" if err?
-      return msg.send "The request was not successful" if res.statusCode isnt 201
+      return msg.send "The request was not successful" if res.statusCode isnt 202 or res.statusCode isnt 201
       callback JSON.parse(body)
 
 deploy = (options) ->
