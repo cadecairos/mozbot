@@ -9,6 +9,9 @@ ROLES = {
   github_admin: [
     "github.list",
     "github.listen"
+  ],
+  heroku_deploys_allowed: [
+    "heroku.deploy"
   ]
 }
 

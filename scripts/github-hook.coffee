@@ -103,7 +103,7 @@ module.exports = (robot) ->
   formatPushes = (event) ->
 
     {ref, commits, pusher, repository, compare} = event.data
-    return null unless refRegex.match(ref)
+    return null unless ref.match(refRegex)
     return null unless commits?.length > 0
 
     branchName = refs.split('/')[2]
