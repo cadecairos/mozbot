@@ -9,11 +9,12 @@
     "hubot-auth": "^2.0.0",
     "hubot-giphy": "^0.6.1",
     "hubot-help": "^0.2.0",
-    "hubot-matteruser": "^3.3.1",
+    "hubot-matteruser": "^3.4.0",
     "hubot-podbaydoors": "^1.0.0",
     "hubot-redis-brain": "0.0.3",
     "hubot-scripts": "^2.17.2",
-    "hubot-standup-alarm": "^0.1.0"
+    "hubot-standup-alarm": "^0.1.0",
+    "hubot-whos-on-call-mattermost": "^1.0.0"
   },
   "engines": {
     "node": "~6.2.0"

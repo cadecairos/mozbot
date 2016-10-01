@@ -3,5 +3,6 @@
   "hubot-redis-brain",
   "hubot-giphy",
   "hubot-standup-alarm",
-  "hubot-podbaydoors"
+  "hubot-podbaydoors",
+  "hubot-whos-on-call-mattermost"
 ]
