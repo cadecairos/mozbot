@@ -23,6 +23,7 @@
 #   dougcole
 
 querystring = require 'querystring'
+request = require 'request'
 
 # Holds a list of jobs, so we can trigger them with a number
 # instead of the job's name. Gets populated on when calling
@@ -45,15 +46,25 @@ jenkinsBuild = (msg, buildWithEmptyParameters) ->
     params = msg.match[3]
     command = if buildWithEmptyParameters then "buildWithParameters" else "build"
     path = if params then "#{url}/job/#{job}/buildWithParameters?#{params}" else "#{url}/job/#{job}/#{command}"
+    auth = ""
 
-    req = msg.http(path)
+    crumb = msg.http("#{url}/crumbIssuer/api/json")
 
     if process.env.HUBOT_JENKINS_AUTH
       auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
-      req.headers Authorization: "Basic #{auth}"
+    
+    if auth then crumb.headers Authorization: "Basic #{auth}"
 
-    req.header('Content-Length', 0)
-    req.post() (err, res, body) ->
+    startBuild = (crumbData) ->
+      options =
+        uri: path
+        headers:
+          "Content-Length": 0
+          "Jenkins-Crumb": crumbData.crumb
+
+      if auth then options.headers.Authorization = "Basic #{auth}"
+
+      request.post options,  (err, res, body) ->
         if err
           msg.reply "Jenkins says: #{err}"
         else if 200 <= res.statusCode < 400 # Or, not an error code.
@@ -64,6 +75,14 @@ jenkinsBuild = (msg, buildWithEmptyParameters) ->
           msg.reply "Build not found, double check that it exists and is spelt correctly."
         else
           msg.reply "Jenkins says: Status #{res.statusCode} #{body}"
+
+    crumb.get() (err, res, body) ->
+      if err
+        msg.reply "Jenkins says: #{err}"
+      else if 200 != res.statusCode
+        msg.reply "The build could not be started, got #{res.statusCode} from Jenkins"
+      else
+        startBuild(JSON.parse(body))
 
 jenkinsDescribe = (msg) ->
     url = process.env.HUBOT_JENKINS_URL
@@ -132,7 +151,6 @@ jenkinsDescribe = (msg) ->
                   response = ""
                   try
                     content = JSON.parse(body)
-                    console.log(JSON.stringify(content, null, 4))
                     jobstatus = content.result || 'PENDING'
                     jobdate = new Date(content.timestamp);
                     response += "LAST JOB: #{jobstatus}, #{jobdate}\n"
