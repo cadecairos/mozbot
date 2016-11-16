@@ -9,7 +9,7 @@
     "hubot-auth": "^2.0.0",
     "hubot-giphy": "^0.6.1",
     "hubot-help": "^0.2.0",
-    "hubot-matteruser": "^3.4.0",
+    "hubot-matteruser": "^3.5.0",
     "hubot-podbaydoors": "^1.0.0",
     "hubot-redis-brain": "0.0.3",
     "hubot-scripts": "^2.17.2",
