@@ -15,7 +15,7 @@
 #   Christopher De Cairos
 module.exports = (robot) ->
 
-  getTotal = (robot) - >
+  getTotal = (robot) ->
     robot.http("https://transaction-storage.mofoprod.net/eoy-2016-total")
       .get() (err, res, body) ->
         if err
