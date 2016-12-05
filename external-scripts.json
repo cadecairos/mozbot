@@ -4,6 +4,5 @@
   "hubot-giphy",
   "hubot-standup-alarm",
   "hubot-podbaydoors",
-  "hubot-whos-on-call-mattermost",
-  "fundraising"
+  "hubot-whos-on-call-mattermost"
 ]
