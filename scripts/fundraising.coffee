@@ -22,7 +22,7 @@ module.exports = (robot) ->
           robot.send "I had trouble fetching the total, try again later?"
         else
           data = JSON.parse body
-          robot.send "We've raised $#{data.sum} \o/"
+          robot.send "We've raised $#{data.sum} \\o/"
 
   robot.respond /fundraising/i, getTotal
   robot.respond /show me the money/i, getTotal
