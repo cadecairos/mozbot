@@ -20,7 +20,7 @@ module.exports = (robot) ->
     robot.send "I'm sorry :( I'll try better next time!"
 
   apologizeTo = (robot) ->
-    robot.send "I'm sorry @#{robot.match[1]}"
+    robot.send "I'm sorry #{robot.match[1]}"
 
   robot.respond /apologize to (@?.+)/i, apologizeTo
   robot.respond /apologize/i, apologize
